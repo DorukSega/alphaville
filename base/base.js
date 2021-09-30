@@ -100,6 +100,8 @@ function On_EngineFrame() {
 //these are left empty so it doesnt produce errors with no games
 function On_keydown() {}
 
+function On_keydown_double() {}
+
 function On_GameLoad() {}
 
 function On_GameFrame() {}
@@ -138,8 +140,7 @@ function App_loadgfx() {
     for (var i = 0; i < game_assetssrc[2].length; i++) {
         var img = document.createElement('img');
         img.src = `./games/${game_name}/assets/interface/${game_assetssrc[2][i]}`;
-
-        img.id = game_assetssrc[0][i];
+        img.id = game_assetssrc[2][i];
         img.onload = function() {
             loaded_images++;
             img.width = img.width;
