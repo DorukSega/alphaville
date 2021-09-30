@@ -16,24 +16,27 @@ var game_width = 0;
 var game_height = 0;
 var game_pixelsize = 1;
 var game_keys = [];
-
+var game_loaded = false;
 
 function On_Load() {
     //engine_debugging = true;
     //Game Engine Instructions
+    App_addlayer(game_layeramnt);
     App_ScreenChange();
     // Frame Functions
     setInterval(On_EngineFrame, 100 / 6); //60fps = 100 / 6
-    On_GameLoad();
     if (engine_debugging == true) {
         setInterval(DEB_frame, 150); //debug}
     }
-    setInterval(On_AnimatonFrame, 150);
+    setInterval(On_AnimatonFrame, 150); //this can be called inside engine frame
     //Keydown event, might be a good idea to switch to a not deprecated code
     document.onkeydown = document.onkeyup = function(e) {
         var e = e || event;
         game_keys[e.keyCode] = e.type == 'keydown';
-    };
+    };;
+    //loads every graphic to memory
+    App_loadgfx();
+
 }
 
 
@@ -46,13 +49,15 @@ function DEB_frame() {
 }
 
 function On_EngineFrame() {
-    // width height check
+    //Width Height Check
     if (screen_width != window.innerWidth || screen_height != window.innerHeight) {
         //this means screen changed
         App_ScreenChange()
     }
-    //Init GameFrame
-    On_GameFrame();
+    //Init Game
+    if (game_loaded == true) {
+        On_GameFrame();
+    }
     //Debug
     if (engine_debugging == true) {
         if (!engine_lastcalledtime) {
@@ -68,6 +73,9 @@ function On_EngineFrame() {
     //Keys
     if (game_keys.filter(item => item == true).length > 1 == true) { //checks if two actions at same time and lowers speed
         On_keydown_double();
+    }
+    if (game_keys.some(Boolean)) { //if key pressed
+        On_keydown();
     }
     if (game_keys[37] == true && game_keys[39] != true) { //left
         On_keydown_arrowkeyleft();
@@ -88,15 +96,79 @@ function On_EngineFrame() {
         On_keydown_enter();
     }
 }
-//these three are left empty so it doesnt produce errors with no games
+
+//these are left empty so it doesnt produce errors with no games
+function On_keydown() {}
+
 function On_GameLoad() {}
 
 function On_GameFrame() {}
 
 function On_AnimatonFrame() {}
 
+function App_loadgfx() {
+    var loaded_images = 0;
+    var ttllength = game_assetssrc[0].length + game_assetssrc[1].length + game_assetssrc[2].length;
+    for (var i = 0; i < game_assetssrc[0].length; i++) {
+        var img = document.createElement('img');
+        img.src = `./games/${game_name}/assets/sprites/${game_assetssrc[0][i]}`;
+        img.id = game_assetssrc[0][i];
+        img.onload = function() {
+            img.width = img.width;
+            img.height = img.height;
+            loaded_images++;
+            App_clear(0);
+            App_text(0, 16, 72, `Loading ${Math.round((100*loaded_images/ttllength))}%`, 10, 255, 255, 255);
+        }
+        document.getElementById("assets").append(img);
+    }
+    for (var i = 0; i < game_assetssrc[1].length; i++) {
+        var img = document.createElement('img');
+        img.src = `./games/${game_name}/assets/tiles/${game_assetssrc[1][i]}`;
+        img.id = game_assetssrc[1][i];
+        img.onload = function() {
+            img.width = img.width;
+            img.height = img.height;
+            loaded_images++;
+            App_clear(0);
+            App_text(0, 16, 72, `Loading ${Math.round((100*loaded_images/ttllength))}%`, 10, 255, 255, 255);
+        }
+        document.getElementById("assets").append(img);
+    }
+    for (var i = 0; i < game_assetssrc[2].length; i++) {
+        var img = document.createElement('img');
+        img.src = `./games/${game_name}/assets/interface/${game_assetssrc[2][i]}`;
+
+        img.id = game_assetssrc[0][i];
+        img.onload = function() {
+            loaded_images++;
+            img.width = img.width;
+            img.height = img.height;
+            if (loaded_images == ttllength) {
+                On_GameLoad();
+                game_loaded = true;
+            } else {
+                App_clear(0);
+                App_text(0, 16, 72, `Loading ${Math.round((100*loaded_images/ttllength))}%`, 10, 255, 255, 255);
+            }
+        }
+        document.getElementById("assets").append(img);
+    }
+}
+
+function App_addlayer(amount) {
+    for (var i = 0; i < amount; i++) {
+        var layer = document.createElement("canvas");
+        layer.className = "canvas";
+        layer.width = 160;
+        layer.height = 144;
+        layer.id = "layer" + i;
+        document.body.append(layer);
+    }
+}
+
 function App_ScreenChange() {
-    var el_gamecanvas = document.querySelectorAll(".canvas");
+    var el_gamecanvas = document.querySelectorAll("canvas");
     //This function will change the game canvas based on screen resolution
     //Getting New Values
     screen_width = window.innerWidth;
@@ -123,7 +195,6 @@ function App_ScreenChange() {
         el_gamecanvas.forEach(el => el.width = game_width);
         el_gamecanvas.forEach(el => el.height = game_height);
     }
-
     //console.log(`${game_width} and ${game_height} px ${game_pixelsize}`);
 }
 
@@ -161,16 +232,18 @@ function App_px(layer, x, y, xsize, ysize, r, g, b, a) {
     }
 }
 
-function App_spr(layer, x, y, img) {
-    //draws a sprite
+function App_spr(layer, x, y, img, w, h) {
+    //Draws a sprite
     var el_gamecanvas = document.querySelector(`#layer${layer}`);
     var pen = el_gamecanvas.getContext("2d");
+    w = w == undefined ? w = img.width : w;
+    h = h == undefined ? h = img.height : h;
     pen.imageSmoothingEnabled = false;
-    pen.drawImage(img, x * game_pixelsize, y * game_pixelsize, img.width * game_pixelsize, img.height * game_pixelsize);
+    pen.drawImage(img, x * game_pixelsize, y * game_pixelsize, w * game_pixelsize, h * game_pixelsize);
 }
 
 function App_text(layer, x, y, text, size, r, g, b) {
-    //draws a font
+    //Draws a font
     r = r == undefined ? r = 0 : r;
     g = g == undefined ? g = 0 : g;
     b = b == undefined ? b = 0 : b;
@@ -183,9 +256,8 @@ function App_text(layer, x, y, text, size, r, g, b) {
 }
 
 function App_clear(layer) {
-    //clears screen
+    //Clears screen
     var el_gamecanvas = document.querySelector(`#layer${layer}`);
     var pen = el_gamecanvas.getContext("2d");
     pen.clearRect(0, 0, el_gamecanvas.width, el_gamecanvas.height);
-
 }
