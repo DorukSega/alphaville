@@ -18,7 +18,7 @@ var game_pixelsize = 1;
 var game_keys = [];
 var game_loaded = false;
 
-function On_Load() {
+var On_Load = window.onload = function() {
     //engine_debugging = true;
     //Game Engine Instructions
     App_addlayer(game_layeramnt);
@@ -36,8 +36,7 @@ function On_Load() {
     };;
     //loads every graphic to memory
     App_loadgfx();
-
-}
+};
 
 
 function DEB_frame() {
@@ -120,7 +119,7 @@ function App_loadgfx() {
             img.height = img.height;
             loaded_images++;
             App_clear(0);
-            App_text(0, 16, 72, `Loading ${Math.round((100*loaded_images/ttllength))}%`, 10, 255, 255, 255);
+            App_text(0, 25, 72, `Loading ${Math.round((100*loaded_images/ttllength))}%`, 10, 255, 255, 255);
         }
         document.getElementById("assets").append(img);
     }
@@ -133,7 +132,7 @@ function App_loadgfx() {
             img.height = img.height;
             loaded_images++;
             App_clear(0);
-            App_text(0, 16, 72, `Loading ${Math.round((100*loaded_images/ttllength))}%`, 10, 255, 255, 255);
+            App_text(0, 25, 72, `Loading ${Math.round((100*loaded_images/ttllength))}%`, 10, 255, 255, 255);
         }
         document.getElementById("assets").append(img);
     }
@@ -150,7 +149,7 @@ function App_loadgfx() {
                 game_loaded = true;
             } else {
                 App_clear(0);
-                App_text(0, 16, 72, `Loading ${Math.round((100*loaded_images/ttllength))}%`, 10, 255, 255, 255);
+                App_text(0, 25, 72, `Loading ${Math.round((100*loaded_images/ttllength))}%`, 10, 255, 255, 255);
             }
         }
         document.getElementById("assets").append(img);
@@ -164,7 +163,7 @@ function App_addlayer(amount) {
         layer.width = 160;
         layer.height = 144;
         layer.id = "layer" + i;
-        document.body.append(layer);
+        document.querySelector("alphaville").append(layer);
     }
 }
 

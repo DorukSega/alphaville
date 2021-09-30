@@ -30,6 +30,7 @@ Main Functions:
         On_keydown_space() > space key down
         On_keydown_enter() > enter key down
         On_keydown_double() > more than one keys down at same time
+        On_keydown() > any key is down
 
 
 Namesheet:
