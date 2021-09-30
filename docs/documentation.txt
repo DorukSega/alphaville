@@ -1,8 +1,11 @@
 Screen Resolution:
+
     160 width to 144 height -> minimum (pixel size 1)
     10:9 aspect ratio
     
+
 Controls:
+
    arrow keys - dpad  //  Movement
    S key  //  Primary Action 
    D key  //  Secondary Action
@@ -10,20 +13,27 @@ Controls:
    Enter Key  //  Select Action (for game menus) - Halts the game
    + and -  //  Volume option (this can change)
 
+
 Main Functions:
-    On_Load() > triggers on load
-    On_EngineFrame() > 60fps // faster than game frame // reserved for engine
-    On_GameFrame() > 60fps
-    On_AnimatonFrame() > triggers every 150 ms // for animation or slow actions
-    On_keydown_arrowkeyleft() > arrow key left down
-    On_keydown_arrowkeyright() > arrow key right down
-    On_keydown_arrowkeytop() > arrow key top down
-    On_keydown_arrowkeybottom()  > arrow key bottom down
-    On_keydown_space() > space key down
-    On_keydown_enter() > enter key down
-    On_keydown_double() > more than one keys down at same time
+
+    Engine Functions: //do not use these on games, reserved for engine
+        On_Load() > triggers on load
+        On_EngineFrame() > 60fps 
+
+    Game Functions:
+        On_GameFrame() > 60fps
+        On_AnimatonFrame() > triggers every 150 ms // for animation or slow actions
+        On_keydown_arrowkeyleft() > arrow key left down
+        On_keydown_arrowkeyright() > arrow key right down
+        On_keydown_arrowkeytop() > arrow key top down
+        On_keydown_arrowkeybottom()  > arrow key bottom down
+        On_keydown_space() > space key down
+        On_keydown_enter() > enter key down
+        On_keydown_double() > more than one keys down at same time
+
 
 Namesheet:
+
     Variables:
         el_{var_name} > Element
         game_{var_name} > Game Variable

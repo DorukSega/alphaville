@@ -20,7 +20,7 @@ body {
 
 .canvas {
     position: absolute;
-    border: 10px solid #f00050;
+    border: .7vmax solid #f00050;
 }
 
 canvas {

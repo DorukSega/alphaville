@@ -49,17 +49,7 @@ function On_EngineFrame() {
     // width height check
     if (screen_width != window.innerWidth || screen_height != window.innerHeight) {
         //this means screen changed
-        try {
-            App_ScreenChange()
-        } catch (error) {
-            var el_gamecanvas = document.querySelectorAll(".canvas");
-            game_width = 160;
-            game_height = 144;
-            el_gamecanvas.forEach(el => el.width = 160);
-            el_gamecanvas.forEach(el => el.height = 144);
-            game_pixelsize = 1;
-            //this currently does not work
-        }
+        App_ScreenChange()
     }
     //Init GameFrame
     On_GameFrame();
@@ -98,7 +88,12 @@ function On_EngineFrame() {
         On_keydown_enter();
     }
 }
+//these three are left empty so it doesnt produce errors with no games
+function On_GameLoad() {}
 
+function On_GameFrame() {}
+
+function On_AnimatonFrame() {}
 
 function App_ScreenChange() {
     var el_gamecanvas = document.querySelectorAll(".canvas");
@@ -107,19 +102,28 @@ function App_ScreenChange() {
     screen_width = window.innerWidth;
     screen_height = window.innerHeight;
     //Applying Canvas Change
-    if (window.innerWidth / window.innerHeight > game_width_std / game_height_std) {
-        const temp_a = Math.floor(window.innerHeight / game_height_std);
-        game_width = game_width_std * temp_a;
-        game_height = game_height_std * temp_a;
-        game_pixelsize = temp_a;
+    if (screen_width < game_width_std || screen_height < game_height_std) {
+        game_width = 160;
+        game_height = 144;
+        el_gamecanvas.forEach(el => el.width = 160);
+        el_gamecanvas.forEach(el => el.height = 144);
+        game_pixelsize = 1;
     } else {
-        const temp_a = Math.floor(window.innerWidth / game_width_std);
-        game_width = game_width_std * temp_a;
-        game_height = game_height_std * temp_a;
-        game_pixelsize = temp_a;
+        if (window.innerWidth / window.innerHeight > game_width_std / game_height_std) {
+            const temp_a = Math.floor(window.innerHeight / game_height_std);
+            game_width = game_width_std * temp_a;
+            game_height = game_height_std * temp_a;
+            game_pixelsize = temp_a;
+        } else {
+            const temp_a = Math.floor(window.innerWidth / game_width_std);
+            game_width = game_width_std * temp_a;
+            game_height = game_height_std * temp_a;
+            game_pixelsize = temp_a;
+        }
+        el_gamecanvas.forEach(el => el.width = game_width);
+        el_gamecanvas.forEach(el => el.height = game_height);
     }
-    el_gamecanvas.forEach(el => el.width = game_width);
-    el_gamecanvas.forEach(el => el.height = game_height);
+
     //console.log(`${game_width} and ${game_height} px ${game_pixelsize}`);
 }
 
