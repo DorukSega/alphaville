@@ -29,7 +29,11 @@ function On_Load() {
         setInterval(DEB_frame, 150); //debug}
     }
     setInterval(On_AnimatonFrame, 150);
-
+    //Keydown event, might be a good idea to switch to a not deprecated code
+    document.onkeydown = document.onkeyup = function(e) {
+        var e = e || event;
+        game_keys[e.keyCode] = e.type == 'keydown';
+    };
 }
 
 
@@ -54,11 +58,12 @@ function On_EngineFrame() {
             el_gamecanvas.forEach(el => el.width = 160);
             el_gamecanvas.forEach(el => el.height = 144);
             game_pixelsize = 1;
+            //this currently does not work
         }
     }
-    //gameframe
+    //Init GameFrame
     On_GameFrame();
-    //debug
+    //Debug
     if (engine_debugging == true) {
         if (!engine_lastcalledtime) {
             engine_lastcalledtime = Date.now();
@@ -70,15 +75,29 @@ function On_EngineFrame() {
         engine_fps = 1 / delta;
         document.getElementById("debug").style.display = "unset";
     }
-    //keydown
-    document.onkeydown = document.onkeyup = function(e) {
-        var e = e || event;
-        game_keys[e.keyCode] = e.type == 'keydown';
-    };
-
+    //Keys
+    if (game_keys.filter(item => item == true).length > 1 == true) { //checks if two actions at same time and lowers speed
+        On_keydown_double();
+    }
+    if (game_keys[37] == true && game_keys[39] != true) { //left
+        On_keydown_arrowkeyleft();
+    }
+    if (game_keys[39] == true && game_keys[37] != true) { //right
+        On_keydown_arrowkeyright();
+    }
+    if (game_keys[38] == true && game_keys[40] != true) { //top
+        On_keydown_arrowkeytop();
+    }
+    if (game_keys[40] == true && game_keys[38] != true) { //down
+        On_keydown_arrowkeybottom();
+    }
+    if (game_keys[32] == true) { //Space
+        On_keydown_space();
+    }
+    if (game_keys[13] == true) { //Enter
+        On_keydown_enter();
+    }
 }
-
-
 
 
 function App_ScreenChange() {
@@ -101,10 +120,10 @@ function App_ScreenChange() {
     }
     el_gamecanvas.forEach(el => el.width = game_width);
     el_gamecanvas.forEach(el => el.height = game_height);
-    console.log(`${game_width} and ${game_height} px ${game_pixelsize}`);
+    //console.log(`${game_width} and ${game_height} px ${game_pixelsize}`);
 }
 
-function Math_ratio(num_1, num_2) {
+function Math_ratio(num_1, num_2) { //finds ratio
     for (num = num_2; num > 1; num--) {
         if ((num_1 % num) == 0 && (num_2 % num) == 0) {
             num_1 = num_1 / num;
@@ -162,7 +181,6 @@ function App_text(layer, x, y, text, size, r, g, b) {
 function App_clear(layer) {
     //clears screen
     var el_gamecanvas = document.querySelector(`#layer${layer}`);
-
     var pen = el_gamecanvas.getContext("2d");
     pen.clearRect(0, 0, el_gamecanvas.width, el_gamecanvas.height);
 
