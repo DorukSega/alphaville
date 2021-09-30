@@ -1,0 +1,30 @@
+Screen Resolution:
+    160 width to 144 height -> minimum (pixel size 1)
+    10:9 aspect ratio
+    
+Controls:
+   arrow keys - dpad  //  Movement
+   S key  //  Primary Action 
+   D key  //  Secondary Action
+   Space Key  //  Start Action (for ingame menus like inventory)
+   Enter Key  //  Select Action (for game menus) - Halts the game
+   + and -  //  Volume option (this can change)
+
+Main Functions:
+    On_Load() > triggers on load
+    On_EngineFrame() > triggers every x times // faster than game frame // reserved for engine
+    On_GameFrame() > triggers every x times
+    On_AnimatonFrame() > triggers every x times // for animation
+
+Namesheet:
+    Variables:
+        el_{var_name} > Element
+        game_{var_name} > Game Variable
+        screen_{var_name} > Screen Variable
+        {main_name}_{var_name}_std > Standard
+    
+    Functions:
+        On_{function_name} > On certain action
+        Math_{function_name} > Mathematical Application
+        App_{function_name} > Application
+    

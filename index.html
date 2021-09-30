@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Test</title>
+    <link rel="icon" type="image/png" href="./base/assets/website/icon.png" />
+    <link rel="stylesheet" href="style.css">
+    <script src="./base/base.js"></script>
+    <script src="./games/tetris/main.js"></script>
+</head>
+
+<body onload="On_Load()">
+    <div id="debug">Framerate: 0</div>
+    <canvas id="layer0" class="canvas" width="160" height="144" style="z-index: 0;"></canvas>
+    <canvas id="layer1" class="canvas" width="160" height="144" style="z-index: 1;"></canvas>
+    <canvas id="layer2" class="canvas" width="160" height="144" style="z-index: 2;"></canvas>
+    <canvas id="layer3" class="canvas" width="160" height="144" style="z-index: 3;"></canvas>
+    <div class="assets" id="trpg">
+        <img class="sprite" id="X_idle_left" src="./games/trpg/assets/sprites/X_idle_left.png" width="16" height="16">
+        <img class="sprite" id="X_idle_right" src="./games/trpg/assets/sprites/X_idle_right.png" width="16" height="16">
+        <img class="sprite" id="X_walk_left" src="./games/trpg/assets/sprites/X_walk_left.png" width="16" height="16">
+        <img class="sprite" id="X_walk_right" src="./games/trpg/assets/sprites/X_walk_right.png" width="16" height="16">
+        <img class="sprite" id="Y_idle_top" src="./games/trpg/assets/sprites/Y_idle_top.png" width="16" height="16">
+        <img class="sprite" id="Y_walk_top_L" src="./games/trpg/assets/sprites/Y_walk_top_L.png" width="16" height="16">
+        <img class="sprite" id="Y_walk_top_R" src="./games/trpg/assets/sprites/Y_walk_top_R.png" width="16" height="16">
+        <img class="sprite" id="Y_idle_bottom" src="./games/trpg/assets/sprites/Y_idle_bottom.png" width="16" height="16">
+        <img class="sprite" id="Y_walk_bottom_L" src="./games/trpg/assets/sprites/Y_walk_bottom_L.png" width="16" height="16">
+        <img class="sprite" id="Y_walk_bottom_R" src="./games/trpg/assets/sprites/Y_walk_bottom_R.png" width="16" height="16">
+        <img class="uielement" id="topbar" src="./games/trpg/assets/topbar.png" width="160" height="22">
+    </div>
+    <div class="assets" id="tetris">
+        <img class="sprite" id="block_tetromino_red" src="./games/tetris/assets/block_tetromino_red.png" width="8" height="8">
+        <img class="tile" id="bordertile_L" src="./games/tetris/assets/bordertile_L.png" width="16" height="144">
+        <img class="tile" id="bordertile_R" src="./games/tetris/assets/bordertile_R.png" width="16" height="144">
+        <img class="uielement" id="tetris_uiel" src="./games/tetris/assets/tetris_uiel.png" width="55" height="144">
+    </div>
+</body>
+
+</html>
