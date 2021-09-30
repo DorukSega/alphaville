@@ -12,15 +12,16 @@ Controls:
 
 Main Functions:
     On_Load() > triggers on load
-    On_EngineFrame() > triggers every x times // faster than game frame // reserved for engine
-    On_GameFrame() > triggers every x times
-    On_AnimatonFrame() > triggers every x times // for animation
+    On_EngineFrame() > 60fps // faster than game frame // reserved for engine
+    On_GameFrame() > 60fps
+    On_AnimatonFrame() > triggers every 150 ms // for animation or slow actions
 
 Namesheet:
     Variables:
         el_{var_name} > Element
         game_{var_name} > Game Variable
         screen_{var_name} > Screen Variable
+        engine_{var_name} > Engine Variable
         {main_name}_{var_name}_std > Standard
     
     Functions:
