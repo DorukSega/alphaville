@@ -9,6 +9,9 @@
 
 body {
     margin: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #202020;
 }
 
 alphaville {
@@ -27,7 +30,7 @@ alphaville {
     height: fit-content;
 }
 
-canvas {
+.canvas {
     position: absolute;
     border: .7vmax solid #f00050;
     font-smooth: never;
@@ -44,6 +47,12 @@ canvas {
 
 #assets {
     display: none;
+}
+
+#maploader {
+    right: 0;
+    top: 0;
+    position: absolute;
 }
 
 @media (max-aspect-ratio: 4/4) {

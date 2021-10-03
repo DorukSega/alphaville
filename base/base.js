@@ -4,6 +4,7 @@ var engine_lastcalledtime;
 var engine_fps;
 var engine_fpsmin = 60;
 
+
 //SCREEN
 var screen_width = window.innerWidth;
 var screen_height = window.innerHeight;
@@ -17,11 +18,12 @@ var game_height = 0;
 var game_pixelsize = 1;
 var game_keys = [];
 var game_loaded = false;
+var game_map;
 
 var On_Load = window.onload = function() {
     //engine_debugging = true;
     //Game Engine Instructions
-    App_addlayer(game_layeramnt);
+    App_addgamelayer(game_layeramnt);
     App_ScreenChange();
     // Frame Functions
     setInterval(On_EngineFrame, 100 / 6); //60fps = 100 / 6
@@ -36,6 +38,7 @@ var On_Load = window.onload = function() {
     };;
     //loads every graphic to memory
     App_loadgfx();
+
 };
 
 
@@ -109,10 +112,10 @@ function On_AnimatonFrame() {}
 
 function App_loadgfx() {
     var loaded_images = 0;
-    var ttllength = game_assetssrc[0].length + game_assetssrc[1].length + game_assetssrc[2].length;
+    var ttllength = game_assetssrc[0].length + game_assetssrc[1].length + game_assetssrc[2].length + game_assetssrc[3].length;
     for (var i = 0; i < game_assetssrc[0].length; i++) {
         var img = document.createElement('img');
-        img.src = `./games/${game_name}/assets/sprites/${game_assetssrc[0][i]}`;
+        img.src = `./games/${game_name}/assets/sprites/${game_assetssrc[0][i]}.png`;
         img.id = game_assetssrc[0][i];
         img.onload = function() {
             img.width = img.width;
@@ -125,7 +128,7 @@ function App_loadgfx() {
     }
     for (var i = 0; i < game_assetssrc[1].length; i++) {
         var img = document.createElement('img');
-        img.src = `./games/${game_name}/assets/tiles/${game_assetssrc[1][i]}`;
+        img.src = `./games/${game_name}/assets/tiles/${game_assetssrc[1][i]}.png`;
         img.id = game_assetssrc[1][i];
         img.onload = function() {
             img.width = img.width;
@@ -138,25 +141,43 @@ function App_loadgfx() {
     }
     for (var i = 0; i < game_assetssrc[2].length; i++) {
         var img = document.createElement('img');
-        img.src = `./games/${game_name}/assets/interface/${game_assetssrc[2][i]}`;
+        img.src = `./games/${game_name}/assets/interface/${game_assetssrc[2][i]}.png`;
         img.id = game_assetssrc[2][i];
+        img.width = img.width;
+        img.height = img.height;
         img.onload = function() {
             loaded_images++;
             img.width = img.width;
             img.height = img.height;
-            if (loaded_images == ttllength) {
-                On_GameLoad();
-                game_loaded = true;
-            } else {
-                App_clear(0);
-                App_text(0, 25, 72, `Loading ${Math.round((100*loaded_images/ttllength))}%`, 10, 255, 255, 255);
-            }
+            App_clear(0);
+            App_text(0, 25, 72, `Loading ${Math.round((100*loaded_images/ttllength))}%`, 10, 255, 255, 255);
         }
         document.getElementById("assets").append(img);
     }
+    for (var i = 0; i < game_assetssrc[3].length; i++) {
+        var img = document.createElement('img');
+        img.src = `./games/${game_name}/assets/maps/${game_assetssrc[3][i]}.png`;
+        img.id = game_assetssrc[3][i];
+        img.onload = function() {
+            loaded_images++;
+            img.width = img.width;
+            img.height = img.height;
+            if (loaded_images <= ttllength) {
+                On_GameLoad();
+                game_loaded = true;
+
+            } else {
+                App_clear(0);
+                App_text(0, 25, 72, `Loading ${Math.floor((100*loaded_images/ttllength))}%`, 10, 255, 255, 255);
+            }
+        }
+        document.getElementById("assets").append(img);
+
+    }
 }
 
-function App_addlayer(amount) {
+function App_addgamelayer(amount) {
+    //adds a game layer
     for (var i = 0; i < amount; i++) {
         var layer = document.createElement("canvas");
         layer.className = "canvas";
@@ -167,8 +188,19 @@ function App_addlayer(amount) {
     }
 }
 
+function App_addmaplayer(amount, x, y) {
+    for (var i = 0; i < amount; i++) {
+        var layer = document.createElement("canvas");
+        layer.className = "maplayer";
+        layer.width = x;
+        layer.height = y;
+        layer.id = "map" + i;
+        document.getElementById("maploader").append(layer);
+    }
+}
+
 function App_ScreenChange() {
-    var el_gamecanvas = document.querySelectorAll("canvas");
+    var el_gamecanvas = document.querySelectorAll(".canvas");
     //This function will change the game canvas based on screen resolution
     //Getting New Values
     screen_width = window.innerWidth;
@@ -208,7 +240,8 @@ function Math_ratio(num_1, num_2) { //finds ratio
     return [num_1, num_2];
 }
 
-function App_px(layer, x, y, xsize, ysize, r, g, b, a) {
+function App_rect(layer, x, y, xsize, ysize, r, g, b, a) {
+    //Draws a rectangle
     var el_gamecanvas = document.querySelector(`#layer${layer}`);
     var pen = el_gamecanvas.getContext("2d");
     x = x * game_pixelsize;
@@ -232,18 +265,23 @@ function App_px(layer, x, y, xsize, ysize, r, g, b, a) {
     }
 }
 
-function App_spr(layer, x, y, img, w, h) {
-    //Draws a sprite
-    var el_gamecanvas = document.querySelector(`#layer${layer}`);
+function App_image(layer, x, y, img, w, h, sx, sy, sw, sh) {
+    //Draws a image
+    layer = Number.isInteger(layer) ? `#layer${layer}` : layer;
+    var el_gamecanvas = document.querySelector(layer);
     var pen = el_gamecanvas.getContext("2d");
-    w = w == undefined ? w = img.width : w;
-    h = h == undefined ? h = img.height : h;
+    w = w == undefined ? img.width : w;
+    h = h == undefined ? img.height : h;
+    sx = sx == undefined ? 0 : sx;
+    sy = sy == undefined ? 0 : sy;
+    sw = sw == undefined ? img.width : sw;
+    sh = sh == undefined ? img.height : sh;
     pen.imageSmoothingEnabled = false;
-    pen.drawImage(img, x * game_pixelsize, y * game_pixelsize, w * game_pixelsize, h * game_pixelsize);
+    pen.drawImage(img, sx, sy, sw, sh, x * game_pixelsize, y * game_pixelsize, w * game_pixelsize, h * game_pixelsize);
 }
 
 function App_text(layer, x, y, text, size, r, g, b) {
-    //Draws a font
+    //Draws a text
     r = r == undefined ? r = 0 : r;
     g = g == undefined ? g = 0 : g;
     b = b == undefined ? b = 0 : b;
@@ -260,4 +298,114 @@ function App_clear(layer) {
     var el_gamecanvas = document.querySelector(`#layer${layer}`);
     var pen = el_gamecanvas.getContext("2d");
     pen.clearRect(0, 0, el_gamecanvas.width, el_gamecanvas.height);
+}
+
+function App_tile(layer, x, y, img, tile, size, margin) {
+    //Draws a tile
+    size = size == undefined ? 16 : size;
+    margin = margin == undefined ? 1 : margin;
+    const w = img.width;
+    //const h = img.height;
+    const row = (w + margin) / (size + margin);
+    //const col = (h + margin) / (size + margin);
+    const sx = ((tile % row) - 1) * (margin + size);
+    const sy = Math.floor(tile / row) * (size + margin);
+    App_image(layer, x, y, img, size, size, sx, sy, size, size);
+}
+
+
+
+//Tile System Functionality
+
+
+function Read_image(img) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', `./games/${game_name}/assets/maps/${img}.png`, true);
+    xhr.responseType = 'arraybuffer';
+
+    xhr.onload = function(e) {
+        if (this.status == 200) {
+            var engine_pngreader = new PNGReader(this.response);
+            engine_pngreader.parse(function(err, png) {
+                if (err) throw err;
+                console.log(png);
+                game_map = png;
+            });
+        }
+    };
+
+    xhr.send();
+}
+
+
+function App_rgbtoindex(r, g, b) {
+    //gets rgb value and turns it to a index value
+    //This interprets data from values (3 different values here) to singular index system
+    //Can also be turned to dynamic 
+    //a or alpha is absent because alpha being zero can have 4 different interpretations
+    const e = 255; //digit value
+    return (r * 1) + (g * (e + 1)) + (b * (e + (e * (e + 1) + 1))); //.... + (a * (e + (e * (e + 1) + (e * (e + (e * (e + 1) + 1))) + 1)))
+}
+
+function App_indextorgb(a) {
+    //gets index value and turns it to a rgb value
+    const e = 255; //digit value
+    const b = Math.floor(a / (e + (e * (e + 1) + 1)));
+    a = a - (b * (e + (e * (e + 1) + 1))); //subtract b
+    const g = Math.floor(a / (e + 1));
+    a = a - (g * (e + 1)); //subtract g
+    const r = Math.floor(a);
+    return [r, g, b];
+}
+
+function App_tiletocolor(ttl, id) {
+    //turns a tile system to rgb
+    const max = App_rgbtoindex(255, 255, 255); //all the colors
+    return App_indextorgb(Math.floor(max / ttl) * id);
+}
+
+function App_colortotile(ttl, r, g, b) {
+    //turns a rgb to tile
+    const max = App_rgbtoindex(255, 255, 255); //all the colors
+    const u = App_rgbtoindex(r, g, b); //our color
+    return Math.ceil(u * ttl / max);
+}
+
+
+function App_interpretimagetomap(map, x, y, tileset, tilesize, margin, gamelayer) {
+    if (game_map == undefined) {
+        Read_image(map);
+    }
+    var checkExist = setInterval(function() {
+        if (game_map != undefined) {
+            //console.log(game_map);
+            clearInterval(checkExist);
+            const row = (tileset.width + margin) / (tilesize + margin);
+            const col = (tileset.height + margin) / (tilesize + margin);
+            const ttl = row * col;
+            var ax, ay, attl;
+            /* 
+            var game_playerWidth = 16;
+            x = Math.floor(playerX - ((game_width_std / 2) - (player_width / 2)) / tilesize); //from playerX to origin
+            y = Math.floor(playerY - ((game_height_std / 2) - (player_width / 2)) / tilesize); //from playerY to origin
+            */
+            ax = Math.ceil(game_width_std / tilesize); //10
+            ay = Math.ceil(game_height_std / tilesize); //9
+            attl = ax * ay;
+            for (var i = 1; i < attl + 1; i++) {
+                var ind = (i - 1).toString().split('').map(Number);
+                var curx = ind.length > 1 ? ind[1] + x : ind[0] + x;
+                var cury = ind.length > 1 ? ind[0] + y : y;
+                var r, g, b;
+                const resp = game_map["getPixel"](curx, cury)
+                r = resp[0];
+                g = resp[1];
+                b = resp[2];
+                //console.log(`${r}, ${g}, ${b}`);
+                var tileid = App_colortotile(ttl, r, g, b);
+                App_tile(gamelayer, curx * tilesize, cury * tilesize, tileset, tileid, tilesize, margin);
+            }
+        }
+    }, 100);
+
 }
