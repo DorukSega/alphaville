@@ -3,8 +3,8 @@
 var game_name = "trpg";
 var game_layeramnt = 7;
 var game_player;
-var game_playerX = 0;
-var game_playerY = 0;
+var game_playerX = 100;
+var game_playerY = 100;
 var game_playerX_axs = 64;
 var game_playerY_axs = 64;
 var game_tilesize = 16;
