@@ -26,7 +26,7 @@ var On_Load = window.onload = function() {
     App_addgamelayer(game_layeramnt);
     App_ScreenChange();
     // Frame Functions
-    setInterval(On_EngineFrame, 100 / 6); //60fps = 100 / 6
+    setInterval(On_EngineFrame, 12); //60fps = 100 / 6
     if (engine_debugging == true) {
         setInterval(DEB_frame, 150); //debug}
     }
@@ -112,7 +112,7 @@ function On_AnimatonFrame() {}
 
 function App_loadgfx() {
     var loaded_images = 0;
-    var ttllength = game_assetssrc[0].length + game_assetssrc[1].length + game_assetssrc[2].length + game_assetssrc[3].length;
+    var ttllength = game_assetssrc[0].length + game_assetssrc[1].length + game_assetssrc[2].length;
     for (var i = 0; i < game_assetssrc[0].length; i++) {
         var img = document.createElement('img');
         img.src = `./games/${game_name}/assets/sprites/${game_assetssrc[0][i]}.png`;
@@ -149,30 +149,16 @@ function App_loadgfx() {
             loaded_images++;
             img.width = img.width;
             img.height = img.height;
-            App_clear(0);
-            App_text(0, 25, 72, `Loading ${Math.round((100*loaded_images/ttllength))}%`, 10, 255, 255, 255);
-        }
-        document.getElementById("assets").append(img);
-    }
-    for (var i = 0; i < game_assetssrc[3].length; i++) {
-        var img = document.createElement('img');
-        img.src = `./games/${game_name}/assets/maps/${game_assetssrc[3][i]}.png`;
-        img.id = game_assetssrc[3][i];
-        img.onload = function() {
-            loaded_images++;
-            img.width = img.width;
-            img.height = img.height;
             if (loaded_images <= ttllength) {
                 On_GameLoad();
+                console.log("test")
                 game_loaded = true;
-
             } else {
                 App_clear(0);
                 App_text(0, 25, 72, `Loading ${Math.floor((100*loaded_images/ttllength))}%`, 10, 255, 255, 255);
             }
         }
         document.getElementById("assets").append(img);
-
     }
 }
 
@@ -322,18 +308,15 @@ function Read_image(img) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', `./games/${game_name}/assets/maps/${img}.png`, true);
     xhr.responseType = 'arraybuffer';
-
     xhr.onload = function(e) {
         if (this.status == 200) {
             var engine_pngreader = new PNGReader(this.response);
             engine_pngreader.parse(function(err, png) {
                 if (err) throw err;
-                console.log(png);
                 game_map = png;
             });
         }
     };
-
     xhr.send();
 }
 
@@ -384,18 +367,16 @@ function App_interpretimagetomap(map, x, y, tileset, tilesize, margin, gamelayer
             const col = (tileset.height + margin) / (tilesize + margin);
             const ttl = row * col;
             var ax, ay, attl;
-            /* 
-            var game_playerWidth = 16;
-            x = Math.floor(playerX - ((game_width_std / 2) - (player_width / 2)) / tilesize); //from playerX to origin
-            y = Math.floor(playerY - ((game_height_std / 2) - (player_width / 2)) / tilesize); //from playerY to origin
-            */
-            ax = Math.ceil(game_width_std / tilesize); //10
-            ay = Math.ceil(game_height_std / tilesize); //9
+            ax = Math.ceil((game_width_std * 2) / tilesize); //10
+            ay = Math.ceil((game_height_std * 2) / tilesize); //9
             attl = ax * ay;
             for (var i = 1; i < attl + 1; i++) {
                 var ind = (i - 1).toString().split('').map(Number);
                 var curx = ind.length > 1 ? ind[1] + x : ind[0] + x;
                 var cury = ind.length > 1 ? ind[0] + y : y;
+                var relx = ind.length > 1 ? ind[1] : ind[0];
+                var rely = ind.length > 1 ? ind[0] : 0;
+                //console.log(`${curx}, ${cury}`);
                 var r, g, b;
                 const resp = game_map["getPixel"](curx, cury)
                 r = resp[0];
@@ -403,9 +384,19 @@ function App_interpretimagetomap(map, x, y, tileset, tilesize, margin, gamelayer
                 b = resp[2];
                 //console.log(`${r}, ${g}, ${b}`);
                 var tileid = App_colortotile(ttl, r, g, b);
-                App_tile(gamelayer, curx * tilesize, cury * tilesize, tileset, tileid, tilesize, margin);
+                App_tile(gamelayer, relx * tilesize, rely * tilesize, tileset, tileid, tilesize, margin);
             }
         }
     }, 100);
+}
 
+function App_readCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
 }
