@@ -17,4 +17,4 @@ It is designed and written for the game viewport size of 160 x 144 with auto sca
 - [Doruk Yılmaz](https://twitter.com/doruksega)
 
 ## Used Libraries
-[pngjs](https://github.com/arian/pngjs) - [License](https://github.com/arian/pngjs/blob/master/LICENSE.md)
+- [pngjs](https://github.com/arian/pngjs) - [License](https://github.com/arian/pngjs/blob/master/LICENSE.md)
