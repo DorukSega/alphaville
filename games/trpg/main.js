@@ -1,7 +1,7 @@
 //TRPG BASE
 //GAME
-var game_name = "trpg";
-var game_layeramnt = 7;
+game.gname = "trpg";
+game.layeramnt = 7;
 var game_player;
 var game_playerX = 100;
 var game_playerY = 100;
@@ -38,15 +38,17 @@ function On_GameLoad() {
     game_player = document.getElementById(game_assetssrc[0][0]);
     game_last_mov = document.getElementById(game_assetssrc[0][0]);
     //Load a save here
-    const save = JSON.parse(App_readCookie(game_name)) != null ? JSON.parse(App_readCookie(game_name)) : [0, 0];
+    const save = JSON.parse(App_readCookie(game.gname)) != null ? JSON.parse(App_readCookie(game.gname)) : [0, 0];
     game_playerX = save[0];
     game_playerY = save[1];
     game_playerX_axs = Math.floor(game_playerX * game_tilesize);
     game_playerY_axs = Math.floor(game_playerY * game_tilesize);
+    App_clear(0);
 }
 
 function On_GameFrame() {
     game_playerstr = 1;
+
     App_clear(1);
     App_clear(2);
     App_clear(3);
@@ -56,13 +58,12 @@ function On_GameFrame() {
     //Background Layer - Layer 0
     App_interpretimagetomap("maptest", game_playerX, game_playerY, document.getElementById(game_assetssrc[1][0]), 16, 1, 0);
 
-    //Sprite Layer - Layer 2
-    //App_rect(2, 80, 80, 50, 50, 200, 0, 0, 100);
+
     //UI Layer - Layer 6
-    App_rect(6, 144, 0, 16, 144, 234, 217, 143, 200);
+    //App_rect(6, 144, 0, 16, 144, 234, 217, 143, 200);
     //Saving player position
     //console.log(`${game_playerX}, ${game_playerY} / ${game_playerX_axs}, ${game_playerY_axs} / ${originX}, ${originY}`);
-    document.cookie = `${game_name} =[${game_playerX},${game_playerY}]; max-age=31536000; SameSite=None; Secure`;
+    //document.cookie = `${game.gname} =[${game_playerX},${game_playerY}]; max-age=31536000; SameSite=None; Secure`;
 }
 
 function On_keydown() {
@@ -96,13 +97,13 @@ function On_keydown_arrowkeybottom() {
 }
 
 function On_AnimatonFrame() {
-    if (game_keys[37] == true && game_keys[39] != true) { //left
+    if (game.keys[37] == true && game.keys[39] != true) { //left
         game_player = game_player != document.getElementById(game_assetssrc[0][2]) ? document.getElementById(game_assetssrc[0][2]) : document.getElementById(game_assetssrc[0][0]);
-    } else if (game_keys[39] == true && game_keys[37] != true) { //right
+    } else if (game.keys[39] == true && game.keys[37] != true) { //right
         game_player = game_player != document.getElementById(game_assetssrc[0][3]) ? document.getElementById(game_assetssrc[0][3]) : document.getElementById(game_assetssrc[0][1]);
-    } else if (game_keys[38] == true && game_keys[40] != true) { //top
+    } else if (game.keys[38] == true && game.keys[40] != true) { //top
         game_player = game_player != document.getElementById(game_assetssrc[0][6]) ? document.getElementById(game_assetssrc[0][6]) : document.getElementById(game_assetssrc[0][5]);
-    } else if (game_keys[40] == true && game_keys[38] != true) { //down
+    } else if (game.keys[40] == true && game.keys[38] != true) { //down
         game_player = game_player != document.getElementById(game_assetssrc[0][9]) ? document.getElementById(game_assetssrc[0][9]) : document.getElementById(game_assetssrc[0][8]);
     } else { game_player = game_last_mov; }
 }

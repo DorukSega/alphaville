@@ -1,100 +1,82 @@
 //ENGINE
-var engine_debugging = false;
-var engine_lastcalledtime;
-var engine_fps;
-var engine_fpsmin = 60;
+
 
 
 //SCREEN
-var screen_width = window.innerWidth;
-var screen_height = window.innerHeight;
+var screen = {
+    width: window.innerWidth,
+    height: window.innerHeight
+};
 
 //GAME
-var game_width_std = 160;
-var game_height_std = 144;
-// changing values
-var game_width = 0;
-var game_height = 0;
-var game_pixelsize = 1;
-var game_keys = [];
-var game_loaded = false;
-var game_map;
+var game = {
+    width: 0,
+    height: 0,
+    width_STD: 160,
+    height_STD: 140,
+    pixelsize: 1,
+    keys: [],
+    isLoaded: false,
+    map: undefined,
+    gname: "Game Name",
+    layeramnt: 3
+};
 
 var On_Load = window.onload = function() {
-    //engine_debugging = true;
     //Game Engine Instructions
-    App_addgamelayer(game_layeramnt);
+    App_addgamelayer(game.layeramnt);
     App_ScreenChange();
     // Frame Functions
     setInterval(On_EngineFrame, 12); //60fps = 100 / 6
-    if (engine_debugging == true) {
-        setInterval(DEB_frame, 150); //debug}
-    }
     setInterval(On_AnimatonFrame, 150); //this can be called inside engine frame
     //Keydown event, might be a good idea to switch to a not deprecated code
     document.onkeydown = document.onkeyup = function(e) {
         var e = e || event;
-        game_keys[e.keyCode] = e.type == 'keydown';
+        game.keys[e.keyCode] = e.type == 'keydown';
     };;
     //loads every graphic to memory
     App_loadgfx();
 
 };
 
+function printg() {
 
-function DEB_frame() {
-    document.getElementById("debug").textContent = "Framerate: " + parseInt(engine_fps);
-    if (engine_fps < engine_fpsmin && engine_fps != 0) {
-        engine_fpsmin = engine_fps;
-        console.log("Min Fps: " + engine_fpsmin);
-    }
 }
 
 function On_EngineFrame() {
     //Width Height Check
-    if (screen_width != window.innerWidth || screen_height != window.innerHeight) {
+    if (screen.width != window.innerWidth || screen.height != window.innerHeight) {
         //this means screen changed
         App_ScreenChange()
     }
     //Init Game
-    if (game_loaded == true) {
+    if (game.isLoaded == true) {
         On_GameFrame();
     }
-    //Debug
-    if (engine_debugging == true) {
-        if (!engine_lastcalledtime) {
-            engine_lastcalledtime = Date.now();
-            engine_fps = 0;
-            return;
-        }
-        var delta = (Date.now() - engine_lastcalledtime) / 1000;
-        engine_lastcalledtime = Date.now();
-        engine_fps = 1 / delta;
-        document.getElementById("debug").style.display = "unset";
-    }
+
     //Keys
-    if (game_keys.filter(item => item == true).length > 1 == true) { //checks if two actions at same time and lowers speed
+    if (game.keys.filter(item => item == true).length > 1 == true) { //checks if two actions at same time and lowers speed
         On_keydown_double();
     }
-    if (game_keys.some(Boolean)) { //if key pressed
+    if (game.keys.some(Boolean)) { //if key pressed
         On_keydown();
     }
-    if (game_keys[37] == true && game_keys[39] != true) { //left
+    if (game.keys[37] == true && game.keys[39] != true) { //left
         On_keydown_arrowkeyleft();
     }
-    if (game_keys[39] == true && game_keys[37] != true) { //right
+    if (game.keys[39] == true && game.keys[37] != true) { //right
         On_keydown_arrowkeyright();
     }
-    if (game_keys[38] == true && game_keys[40] != true) { //top
+    if (game.keys[38] == true && game.keys[40] != true) { //top
         On_keydown_arrowkeytop();
     }
-    if (game_keys[40] == true && game_keys[38] != true) { //down
+    if (game.keys[40] == true && game.keys[38] != true) { //down
         On_keydown_arrowkeybottom();
     }
-    if (game_keys[32] == true) { //Space
+    if (game.keys[32] == true) { //Space
         On_keydown_space();
     }
-    if (game_keys[13] == true) { //Enter
+    if (game.keys[13] == true) { //Enter
         On_keydown_enter();
     }
 }
@@ -115,7 +97,7 @@ function App_loadgfx() {
     var ttllength = game_assetssrc[0].length + game_assetssrc[1].length + game_assetssrc[2].length;
     for (var i = 0; i < game_assetssrc[0].length; i++) {
         var img = document.createElement('img');
-        img.src = `./games/${game_name}/assets/sprites/${game_assetssrc[0][i]}.png`;
+        img.src = `./games/${game.gname}/assets/sprites/${game_assetssrc[0][i]}.png`;
         img.id = game_assetssrc[0][i];
         img.onload = function() {
             img.width = img.width;
@@ -128,7 +110,7 @@ function App_loadgfx() {
     }
     for (var i = 0; i < game_assetssrc[1].length; i++) {
         var img = document.createElement('img');
-        img.src = `./games/${game_name}/assets/tiles/${game_assetssrc[1][i]}.png`;
+        img.src = `./games/${game.gname}/assets/tiles/${game_assetssrc[1][i]}.png`;
         img.id = game_assetssrc[1][i];
         img.onload = function() {
             img.width = img.width;
@@ -141,7 +123,7 @@ function App_loadgfx() {
     }
     for (var i = 0; i < game_assetssrc[2].length; i++) {
         var img = document.createElement('img');
-        img.src = `./games/${game_name}/assets/interface/${game_assetssrc[2][i]}.png`;
+        img.src = `./games/${game.gname}/assets/interface/${game_assetssrc[2][i]}.png`;
         img.id = game_assetssrc[2][i];
         img.width = img.width;
         img.height = img.height;
@@ -151,8 +133,7 @@ function App_loadgfx() {
             img.height = img.height;
             if (loaded_images <= ttllength) {
                 On_GameLoad();
-                console.log("test")
-                game_loaded = true;
+                game.isLoaded = true;
             } else {
                 App_clear(0);
                 App_text(0, 25, 72, `Loading ${Math.floor((100*loaded_images/ttllength))}%`, 10, 255, 255, 255);
@@ -189,31 +170,31 @@ function App_ScreenChange() {
     var el_gamecanvas = document.querySelectorAll(".canvas");
     //This function will change the game canvas based on screen resolution
     //Getting New Values
-    screen_width = window.innerWidth;
-    screen_height = window.innerHeight;
+    screen.width = window.innerWidth;
+    screen.height = window.innerHeight;
     //Applying Canvas Change
-    if (screen_width < game_width_std || screen_height < game_height_std) {
-        game_width = 160;
-        game_height = 144;
+    if (screen.width < game.width_STD || screen.height < game.height_STD) {
+        game.width = 160;
+        game.height = 144;
         el_gamecanvas.forEach(el => el.width = 160);
         el_gamecanvas.forEach(el => el.height = 144);
-        game_pixelsize = 1;
+        game.pixelsize = 1;
     } else {
-        if (window.innerWidth / window.innerHeight > game_width_std / game_height_std) {
-            const temp_a = Math.floor(window.innerHeight / game_height_std);
-            game_width = game_width_std * temp_a;
-            game_height = game_height_std * temp_a;
-            game_pixelsize = temp_a;
+        if (window.innerWidth / window.innerHeight > game.width_STD / game.height_STD) {
+            const temp_a = Math.floor(window.innerHeight / game.height_STD);
+            game.width = game.width_STD * temp_a;
+            game.height = game.height_STD * temp_a;
+            game.pixelsize = temp_a;
         } else {
-            const temp_a = Math.floor(window.innerWidth / game_width_std);
-            game_width = game_width_std * temp_a;
-            game_height = game_height_std * temp_a;
-            game_pixelsize = temp_a;
+            const temp_a = Math.floor(window.innerWidth / game.width_STD);
+            game.width = game.width_STD * temp_a;
+            game.height = game.height_STD * temp_a;
+            game.pixelsize = temp_a;
         }
-        el_gamecanvas.forEach(el => el.width = game_width);
-        el_gamecanvas.forEach(el => el.height = game_height);
+        el_gamecanvas.forEach(el => el.width = game.width);
+        el_gamecanvas.forEach(el => el.height = game.height);
     }
-    //console.log(`${game_width} and ${game_height} px ${game_pixelsize}`);
+    //console.log(`${game.width} and ${game.height} px ${game.pixelsize}`);
 }
 
 function Math_ratio(num_1, num_2) { //finds ratio
@@ -230,10 +211,10 @@ function App_rect(layer, x, y, xsize, ysize, r, g, b, a) {
     //Draws a rectangle
     var el_gamecanvas = document.querySelector(`#layer${layer}`);
     var pen = el_gamecanvas.getContext("2d");
-    x = x * game_pixelsize;
-    y = y * game_pixelsize;
-    xsize = game_pixelsize * xsize;
-    ysize = game_pixelsize * ysize;
+    x = x * game.pixelsize;
+    y = y * game.pixelsize;
+    xsize = game.pixelsize * xsize;
+    ysize = game.pixelsize * ysize;
     if (a == undefined) {
         pen.fillStyle = `rgb(${r},${g},${b})`;
         pen.fillRect(x, y, xsize, ysize);
@@ -263,7 +244,7 @@ function App_image(layer, x, y, img, w, h, sx, sy, sw, sh) {
     sw = sw == undefined ? img.width : sw;
     sh = sh == undefined ? img.height : sh;
     pen.imageSmoothingEnabled = false;
-    pen.drawImage(img, sx, sy, sw, sh, x * game_pixelsize, y * game_pixelsize, w * game_pixelsize, h * game_pixelsize);
+    pen.drawImage(img, sx, sy, sw, sh, x * game.pixelsize, y * game.pixelsize, w * game.pixelsize, h * game.pixelsize);
 }
 
 function App_text(layer, x, y, text, size, r, g, b) {
@@ -273,10 +254,10 @@ function App_text(layer, x, y, text, size, r, g, b) {
     b = b == undefined ? b = 0 : b;
     var el_gamecanvas = document.querySelector(`#layer${layer}`);
     var pen = el_gamecanvas.getContext("2d");
-    size = size * game_pixelsize;
+    size = size * game.pixelsize;
     pen.font = `normal ${size}px PStart2P`;
     pen.fillStyle = `rgb(${r},${g},${b})`;
-    pen.fillText(text, x * game_pixelsize, y * game_pixelsize);
+    pen.fillText(text, x * game.pixelsize, y * game.pixelsize);
 }
 
 function App_clear(layer) {
@@ -306,14 +287,14 @@ function App_tile(layer, x, y, img, tile, size, margin) {
 
 function Read_image(img) {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', `./games/${game_name}/assets/maps/${img}.png`, true);
+    xhr.open('GET', `./games/${game.gname}/assets/maps/${img}.png`, true);
     xhr.responseType = 'arraybuffer';
-    xhr.onload = function(e) {
+    xhr.onload = function() {
         if (this.status == 200) {
             var engine_pngreader = new PNGReader(this.response);
             engine_pngreader.parse(function(err, png) {
                 if (err) throw err;
-                game_map = png;
+                game.map = png;
             });
         }
     };
@@ -356,19 +337,19 @@ function App_colortotile(ttl, r, g, b) {
 
 
 function App_interpretimagetomap(map, x, y, tileset, tilesize, margin, gamelayer) {
-    if (game_map == undefined) {
+    if (game.map == undefined) {
         Read_image(map);
     }
     var checkExist = setInterval(function() {
-        if (game_map != undefined) {
-            //console.log(game_map);
+        if (game.map != undefined) {
+            //console.log(game.map);
             clearInterval(checkExist);
             const row = (tileset.width + margin) / (tilesize + margin);
             const col = (tileset.height + margin) / (tilesize + margin);
             const ttl = row * col;
             var ax, ay, attl;
-            ax = Math.ceil((game_width_std * 2) / tilesize); //10
-            ay = Math.ceil((game_height_std * 2) / tilesize); //9
+            ax = Math.ceil((game.width_STD * 2) / tilesize); //10
+            ay = Math.ceil((game.height_STD * 2) / tilesize); //9
             attl = ax * ay;
             for (var i = 1; i < attl + 1; i++) {
                 var ind = (i - 1).toString().split('').map(Number);
@@ -378,7 +359,7 @@ function App_interpretimagetomap(map, x, y, tileset, tilesize, margin, gamelayer
                 var rely = ind.length > 1 ? ind[0] : 0;
                 //console.log(`${curx}, ${cury}`);
                 var r, g, b;
-                const resp = game_map["getPixel"](curx, cury)
+                const resp = game.map["getPixel"](curx, cury)
                 r = resp[0];
                 g = resp[1];
                 b = resp[2];
